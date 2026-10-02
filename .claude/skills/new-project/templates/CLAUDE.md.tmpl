@@ -1,0 +1,27 @@
+# {{PROJECT_NAME}}
+
+{{PURPOSE}}
+
+## Stack
+{{STACK}}
+
+Enabled my-toolkit plugins: {{KITS}}
+
+## Commands
+| Task | Command |
+|------|---------|
+| Install | `{{INSTALL_CMD}}` |
+| Dev server | `{{DEV_CMD}}` (run it in the background, never in the foreground) |
+| Build | `{{BUILD_CMD}}` |
+| Test | `{{TEST_CMD}}` |
+| Lint | `{{LINT_CMD}}` |
+| Typecheck | `{{TYPECHECK_CMD}}` |
+
+## Conventions (project layer: style and local details)
+{{CONVENTIONS}}
+
+## How this project uses the toolkit
+- **Core** rules apply everywhere: minimal changes, tests/review/security checks are never optional, plan non-trivial work with `core:planner`, review with `core:code-reviewer`.
+- **Core wins on safety, this project wins on style.** Put style and local decisions here, not in the toolkit.
+- Protection hooks (config protection, `--no-verify`, foreground dev servers, secrets in commits) may block an action. Fix the cause; to change a lint/formatter config deliberately, switch `config-protection` off temporarily (see the my-toolkit README).
+- Hooks can be switched off per project with `MY_TOOLKIT_DISABLED_HOOKS` in `.claude/settings.json` `env`.
