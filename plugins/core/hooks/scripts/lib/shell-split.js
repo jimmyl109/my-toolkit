@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Split a shell command into segments by operators (&&, ||, ;, &)
+ * Split a shell command into segments by operators (&&, ||, ;, &, newline)
  * while respecting quoting (single/double) and escaped characters.
  * Redirection operators (&>, >&, 2>&1) are NOT treated as separators.
  */
@@ -58,8 +58,8 @@ function splitShellSegments(command) {
       continue;
     }
 
-    // ; separator
-    if (ch === ';') {
+    // ; separator (a newline outside quotes also ends a command)
+    if (ch === ';' || ch === '\n') {
       if (current.trim()) segments.push(current.trim());
       current = '';
       continue;

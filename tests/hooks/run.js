@@ -129,6 +129,12 @@ try {
   check(H, 'tmux launcher form', 0, run(S, bash('tmux new-session -d -s dev "npm run dev"')));
   check(H, 'dev-docs script is not a dev server', 0, run(S, bash('npm run dev-docs')));
   check(H, 'npm run build', 0, run(S, bash('npm run build')));
+  check(H, 'heredoc that merely WRITES "npm run dev" into a doc -> allowed', 0, run(S, bash("cat > CLAUDE.md <<'EOF'\n| Dev server | `npm run dev` |\nEOF")));
+  check(H, 'python heredoc writing "npm run dev" into a template -> allowed', 0, run(S, bash("python3 - <<'EOF'\nopen('x','w').write('DEV_CMD: npm run dev')\nEOF")));
+  check(H, 'foreground dev server on a NEW LINE is blocked', 2, run(S, bash('echo hi\nnpm run dev')), 'BLOCKED');
+  check(H, 'real foreground dev server after a heredoc -> BLOCK', 2, run(S, bash("cat > f <<'EOF'\nnpm run dev\nEOF\nnpm run dev")), 'BLOCKED');
+  check(H, 'background dev server on a new line (&) -> allowed', 0, run(S, bash('echo hi\nnpm run dev &')));
+  check(H, 'quoted multi-line string mentioning it -> allowed', 0, run(S, bash("echo 'line1\nnpm run dev\nline3'")));
   check(H, 'switched off', 0, run(S, bash('npm run dev'), off(H)));
 
   // ------------------------------------------------------------ commit-quality
