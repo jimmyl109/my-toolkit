@@ -49,8 +49,14 @@ All adapted from ECC `scripts/hooks` @ `ef648e0`. ECC's wrapper stack (`run-with
 | `stop-format.js` | ECC `stop-format-typecheck.js` (format half), `lib/resolve-formatter.js` | Separate hook, OFF by default; Prettier/Biome from the project's `node_modules/.bin` only (no package-manager fallbacks, no Windows shims). |
 | `lib/hook-flags.js`, `lib/hook-io.js` | original (modelled on ECC `lib/hook-flags.js`) | `MY_TOOLKIT_DISABLED_HOOKS`, `MY_TOOLKIT_ENABLE_HOOKS`, `MY_TOOLKIT_HOOKS=off`; bounded stdin, `block()` / `context()` / `message()` helpers. |
 
+## Tests
+
+| File | Source | Changes |
+|------|--------|---------|
+| `tests/hooks/run.js` | original | Node port of the Phase 3 verification harness: builds a throwaway TS/React git project, drives every hook with synthetic payloads (59 cases), prints a markdown pass/fail table. Fake secrets are assembled at runtime. |
+
 ## Executable scripts
 
 - **Skills (core and kit): none.** No script was copied from any ECC skill. ECC's `tdd-workflow` references `scripts/setup-package-manager.js`; it was not imported and the skill now says to find the project's own commands.
-- **Hooks:** the 14 `.js` files under `plugins/core/hooks/scripts/` (listed above) are the only executable code in the repo. They exist because ECC's protections are implemented as Node scripts; each is run by `hooks.json` with `node` and nothing else is executed.
+- **Hooks:** the 14 `.js` files under `plugins/core/hooks/scripts/` (listed above) are the only executable code run by the plugins; `tests/hooks/run.js` is a developer-only test script and is not part of any plugin. They exist because ECC's protections are implemented as Node scripts; each is run by `hooks.json` with `node` and nothing else is executed.
 - **Not imported:** ECC's other hooks (gateguard, learning/observation, telemetry, cost tracking, Plan Canvas, MCP health, governance capture, notifications, session-context loading) and `git-push-reminder`.
