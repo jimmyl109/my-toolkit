@@ -14,7 +14,7 @@ claude plugin install core@my-toolkit || echo "core install FAILED"
 ```
 
 Requirements:
-- The session must be able to read `jimmyl109/my-toolkit` (public, or attached to the session with `add_repo`). A 403 from `github.com/jimmyl109/my-toolkit` means it is not.
+- `jimmyl109/my-toolkit` must be readable from the session (it is public). A 403 or 404 from `github.com/jimmyl109/my-toolkit` means it is not, or that the network policy blocks it.
 - The environment's network policy must allow `github.com` and your package registry.
 - `node` must be on `PATH` (the hooks are Node scripts).
 

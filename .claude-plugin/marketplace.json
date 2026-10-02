@@ -14,6 +14,11 @@
       "name": "typescript-react",
       "source": "./plugins/typescript-react",
       "description": "Opt-in kit for TypeScript, React and Next.js: reviewers, React build resolver, React/testing/frontend skills, and a standards skill."
+    },
+    {
+      "name": "project-starter",
+      "source": "./plugins/project-starter",
+      "description": "Opt-in: new-project skill that bootstraps a repo (interview, scaffold, project layer, verification, push to an empty repo you created). Install only in your bootstrap environment."
     }
   ]
 }

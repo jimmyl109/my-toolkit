@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Static checks for the repo-level new-project skill (.claude/skills/new-project).
+ * Static checks for the new-project skill (plugins/project-starter/skills/new-project).
  * It cannot test the conversation itself; it guards the parts that can silently rot:
  * frontmatter, templates, placeholders, JSON validity, and references to agents / catalog entries.
  *
@@ -13,7 +13,7 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '../..');
-const SKILL_DIR = path.join(ROOT, '.claude/skills/new-project');
+const SKILL_DIR = path.join(ROOT, 'plugins/project-starter/skills/new-project');
 const TEMPLATES = ['CLAUDE.md.tmpl', 'settings.json.tmpl', 'cloud-setup.md.tmpl', 'NOTES.md.tmpl'];
 
 const results = [];
@@ -39,6 +39,16 @@ for (const t of TEMPLATES) {
     check(`placeholder ${ph} (${t}) is documented in SKILL.md`, skill.includes(ph));
   }
 }
+
+// plugin wiring
+const manifest = JSON.parse(read(path.join(ROOT, 'plugins/project-starter/.claude-plugin/plugin.json')));
+check('project-starter manifest name is project-starter', manifest.name === 'project-starter');
+const mp = JSON.parse(read(path.join(ROOT, '.claude-plugin/marketplace.json')));
+check('project-starter is registered in marketplace.json', mp.plugins.some(p => p.name === 'project-starter' && p.source === './plugins/project-starter'));
+check('SKILL.md references templates via ${CLAUDE_PLUGIN_ROOT}', skill.includes('${CLAUDE_PLUGIN_ROOT}/skills/new-project/templates/'));
+check('SKILL.md does not point at the old repo-level path (.claude/skills)', !skill.includes('.claude/skills/new-project'));
+check('SKILL.md says the target is the session\'s single repo (no second-repo wording)', !/attach both|second repo/i.test(skill));
+check('old repo-level skill directory is gone', !fs.existsSync(path.join(ROOT, '.claude/skills/new-project')));
 
 // settings template: valid JSON, right marketplace, core enabled
 try {

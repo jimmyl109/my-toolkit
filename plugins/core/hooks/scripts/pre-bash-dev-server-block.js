@@ -221,11 +221,32 @@ function isFollowedByBackgroundOperator(cmd, segment) {
   return rest.startsWith('&') && !rest.startsWith('&&');
 }
 
+/**
+ * Heredoc bodies (`cat > f <<'EOF' ... EOF`) are data written to a file or stdin, not commands: a
+ * script that merely WRITES "npm run dev" into a doc must not be blocked. Remove the bodies (keep the
+ * command line that introduces them) before looking for dev-server commands.
+ */
+function stripHeredocBodies(cmd) {
+  const lines = cmd.split('\n');
+  const out = [];
+  let end = null;
+  for (const line of lines) {
+    if (end !== null) {
+      if (line.replace(/^\t+/, '').trim() === end) end = null;
+      continue;
+    }
+    out.push(line);
+    const m = line.match(/<<-?\s*(['"]?)([A-Za-z_][A-Za-z0-9_]*)\1/);
+    if (m) end = m[2];
+  }
+  return out.join('\n');
+}
+
 runHook('dev-server-block', ({ input, block }) => {
   if (process.platform === 'win32') return;
   if (input.tool_input?.run_in_background === true) return;
 
-  const cmd = String(input.tool_input?.command || '');
+  const cmd = stripHeredocBodies(String(input.tool_input?.command || ''));
   const foreground = collectCheckSegments(cmd)
     .filter(isBlockedDevSegment)
     .some(segment => !isFollowedByBackgroundOperator(cmd, segment));
