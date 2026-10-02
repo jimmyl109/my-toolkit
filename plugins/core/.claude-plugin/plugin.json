@@ -1,0 +1,7 @@
+{
+  "name": "core",
+  "description": "Always-on core: planner, reviewers, TDD and build agents, core skills, and a SessionStart hook that loads the common rules.",
+  "author": { "name": "jimmyl109" },
+  "license": "MIT",
+  "keywords": ["core", "tdd", "code-review", "security", "verification"]
+}

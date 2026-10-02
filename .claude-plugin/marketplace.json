@@ -1,0 +1,12 @@
+{
+  "name": "my-toolkit",
+  "description": "Personal Claude Code plugins: one always-on core plus small opt-in kits.",
+  "owner": { "name": "jimmyl109" },
+  "plugins": [
+    {
+      "name": "core",
+      "source": "./plugins/core",
+      "description": "Always-on: planner, code/security reviewers, TDD and build agents, core skills, common rules loaded at session start."
+    }
+  ]
+}
