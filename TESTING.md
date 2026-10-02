@@ -4,7 +4,7 @@ Goal: find out whether core + `typescript-react` make Claude plan, test, review 
 
 ## 1. Set up
 
-Pick one real TS/React project. In its `.claude/settings.json`:
+Pick one real TS/React project. **Local machine:** in its `.claude/settings.json`:
 
 ```json
 {
@@ -18,13 +18,28 @@ Pick one real TS/React project. In its `.claude/settings.json`:
 }
 ```
 
-- The marketplace loads from the default branch (`main`). **Before the PR is merged**, test from a clone instead:
-  `git clone -b claude/peaceful-darwin-y5vtdb https://github.com/jimmyl109/my-toolkit.git ~/my-toolkit-trial`, then
+- The marketplace loads from the default branch (`main`). To test an **unmerged branch**, clone it and add the clone as the marketplace instead:
+  `git clone -b <branch> https://github.com/jimmyl109/my-toolkit.git ~/my-toolkit-trial`, then
   `claude plugin marketplace add ~/my-toolkit-trial --scope project` and `claude plugin install core@my-toolkit --scope project` (and `typescript-react@my-toolkit`).
   Pull the clone to pick up changes; run `/reload-plugins`.
 - Needs `node` on `PATH`. Trust the folder when asked.
 - Confirm: `claude plugin list` shows both plugins enabled, and a new session's context contains "Core Rules (always on)" (ask: "what rules were loaded at session start?").
 - Start a trial log in the project: copy the template at the bottom into `TRIAL-NOTES.md` (commit it or keep it local).
+
+**Cloud sessions:** the settings file above is not enough in a headless/cloud session (the folder isn't trusted and plugins aren't installed automatically). Put the install in the cloud environment's setup script instead:
+
+```
+claude plugin marketplace add jimmyl109/my-toolkit
+claude plugin install core@my-toolkit
+claude plugin install typescript-react@my-toolkit
+npm ci
+```
+
+- Check in a new cloud session: ask "what rules were loaded at session start, and which `core:*` agents can you see?" If the answer is none, check the setup script's output, the environment's network access to `github.com`, and repo access if the marketplace repo is private.
+- Hooks that use the project's tools (`stop-typecheck`, `stop-format`, ESLint in `commit-quality`) stay silent without `node_modules`, so keep `npm ci` (or your package manager's install) in the setup script.
+- To switch hooks off or on for every session in a cloud environment, set `MY_TOOLKIT_DISABLED_HOOKS` / `MY_TOOLKIT_ENABLE_HOOKS` as environment variables in the environment settings.
+- For an unmerged branch: `git clone -b <branch> https://github.com/jimmyl109/my-toolkit.git /tmp/my-toolkit && claude plugin marketplace add /tmp/my-toolkit` in the setup script.
+
 
 ## 2. Day-one smoke test (5 minutes)
 
