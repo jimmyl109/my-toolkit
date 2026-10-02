@@ -54,7 +54,7 @@ All adapted from ECC `scripts/hooks` @ `ef648e0`. ECC's wrapper stack (`run-with
 | File | Source | Changes |
 |------|--------|---------|
 | `tests/hooks/run.js` | original | Node port of the Phase 3 verification harness: builds a throwaway TS/React git project, drives every hook with synthetic payloads (59 cases), prints a markdown pass/fail table. Fake secrets are assembled at runtime. |
-| `.claude/skills/new-project/SKILL.md`, `templates/*.tmpl` | original | Repo-level, stack-agnostic skill that bootstraps a new project (interview, kit selection from `CATALOG.md`, install list, official scaffolder, project layer, verification, push to a user-created repo). Not part of any plugin. |
+| `plugins/project-starter/skills/new-project/SKILL.md`, `templates/*.tmpl`, `.claude-plugin/plugin.json` | original | Opt-in plugin with a stack-agnostic skill that bootstraps a new project in the session's empty repo (interview, kit selection from `CATALOG.md`, install list, official scaffolder, project layer, verification, push to a branch). Started as a repo-level skill; moved into a plugin once the repo became public so it works from a single-repo session. |
 | `tests/skills/check.js` | original | Static checks for that skill: frontmatter, templates, placeholders, JSON validity, catalog/marketplace sync, referenced agents. |
 
 ## Executable scripts

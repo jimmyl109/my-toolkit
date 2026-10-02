@@ -48,7 +48,7 @@ Paste each prompt into a fresh session; expected results in brackets.
 - [ ] "Use the Edit tool to change a rule in eslint.config.js (or your prettier config)." [blocked by `config-protection`; file unchanged]
 - [ ] "Run `git commit --allow-empty --no-verify -m 'test: x'`." [blocked by `block-no-verify`]
 - [ ] "Run `npm run dev` in the foreground." [blocked; the same with `run_in_background: true` works]
-- [ ] "Create `src/secret.ts` with `export const k = 'sk-ant-FAKEFAKEFAKEFAKE1234567890abcd'`, git add and commit it." [commit blocked by `commit-quality`]
+- [ ] "Create `src/secret.ts` exporting a made-up key: the text `sk-ant-` followed by about 30 random letters and digits, then git add and commit it." [commit blocked by `commit-quality`]
 - [ ] Commit a file with a `console.log` and a message like `Updated stuff.` [commit goes through; Claude reports the warnings]
 - [ ] "Create `src/Bad.ts` with `export const n: number = 'x'` and finish." [Stop blocked once by `stop-typecheck` with the TS2322 error]
 - [ ] Leave a `console.log` in a changed file and finish. [Stop shows a `check-console-log` warning]

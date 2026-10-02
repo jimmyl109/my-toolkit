@@ -5,12 +5,12 @@ description: Bootstrap a new project end to end for any kind of stack. Interview
 
 # New Project
 
-Build a verified starting point for a new repo, using the my-toolkit layers: **core** (always on), **kits** (stack-specific, from `CATALOG.md`), **project** (the new repo's own `CLAUDE.md` + `.claude/settings.json`). This skill lives in my-toolkit (repo-level): it is not part of any plugin.
+Build a verified starting point for a new repo, using the my-toolkit layers: **core** (always on), **kits** (stack-specific, from `CATALOG.md`), **project** (the new repo's own `CLAUDE.md` + `.claude/settings.json`). This skill ships in the opt-in `project-starter` plugin of my-toolkit (install it only in the environment used for bootstrapping). The session you are running in was started on the **new, empty repo** the user created: that repo is the target, and only one repo is involved because my-toolkit is public.
 
 Scope: scaffold, tooling, docs and a *verified* starting point. Product features come later, from a plan. Follow the core rules throughout: minimal changes, tests are not optional, review and security checks are not optional.
 
 ## Guardrails
-- **You never create the GitHub repo, change its visibility, force-push, or push to `main` without the user saying so.** The user creates an empty repo and attaches it to this session. If it is not attached, stop at "verified locally" and say what to attach.
+- **You never create the GitHub repo, change its visibility, force-push, or push to `main` without the user saying so.** The user creates an empty repo and starts this session on it. If the session's repo is not that empty repo, or pushing is refused, stop at "verified locally" and say what is missing.
 - Ask before any outward-facing or destructive action and before installing anything globally.
 - No secrets in files. No telemetry, learning features or silent detection scripts: you ask and you check, visibly.
 - Never invent versions or boilerplate from memory: use the stack's official scaffolder and read its output.
@@ -22,7 +22,7 @@ Scope: scaffold, tooling, docs and a *verified* starting point. Product features
 Use AskUserQuestion, a few questions at a time. Cover: what it is and who it is for; language/framework (offer a recommendation with trade-offs, not a menu dump); hosting/deploy target; backend or data needs; tests expected; constraints or things off-limits; the project name and the target repo (`owner/name`). Confirm the answers back in a short summary.
 
 ### 2. Choose kits from the catalog
-Read `CATALOG.md` at the repo root and match the chosen stack against each kit's trigger words. Enable every matching kit plus `core`. If no kit matches, say "core only, no kit for this stack yet" and suggest building one later. Do not hard-code stacks here: the catalog is the source of truth.
+Read the toolkit's `CATALOG.md`: from the marketplace checkout at `~/.claude/plugins/marketplaces/my-toolkit/CATALOG.md`, or, if that file is missing, fetch `https://raw.githubusercontent.com/jimmyl109/my-toolkit/main/CATALOG.md`. Match the chosen stack against each kit's trigger words. Enable every matching kit plus `core`. If no kit matches, say "core only, no kit for this stack yet" and suggest building one later. Do not hard-code stacks here: the catalog is the source of truth.
 
 ### 3. Show the install list, then get approval
 Check what is already present (`which`, `--version`) and list what is missing: runtimes with versions, package manager, and dev tools (typecheck, lint, format, test), each with a one-line reason. Wait for approval before installing. Prefer project-local installs over global ones.
@@ -31,10 +31,10 @@ Check what is already present (`which`, `--version`) and list what is missing: r
 For anything non-trivial, use the `core:planner` agent to outline structure, tooling and first milestones before scaffolding. Keep the plan short.
 
 ### 5. Scaffold
-Work in a fresh directory that is a git repo (`git init`, remote set to the attached repo). Use the stack's official scaffolder non-interactively (flags, not prompts). Add lint, format, typecheck and test tooling appropriate to the stack. Create and commit the lockfile. Keep the first commit minimal and conventional.
+Work in the session's repository (it should be empty or hold only a README; check `git status`, `ls` and `git remote -v` first, and stop to ask if it already has project files). Do not create a new repo or directory elsewhere. Use the stack's official scaffolder non-interactively (flags, not prompts). Add lint, format, typecheck and test tooling appropriate to the stack. Create and commit the lockfile. Keep the first commit minimal and conventional.
 
 ### 6. Write the project layer
-Fill the templates in `.claude/skills/new-project/templates/` (replace every `{{PLACEHOLDER}}`):
+Fill the templates in `${CLAUDE_PLUGIN_ROOT}/skills/new-project/templates/` (replace every `{{PLACEHOLDER}}`):
 
 | Template | Output | Placeholders |
 |----------|--------|--------------|
@@ -49,12 +49,12 @@ Also add a `README.md` stub and a `.gitignore` suited to the stack (generated by
 Run, in order: install, build, typecheck, lint, tests. For apps, start the dev server in the **background** (`run_in_background` or `&`, never in the foreground) with its log written **outside the repo** (for example `/tmp/<project>-dev.log`), note its PID, check it responds (curl, or a screenshot if a browser tool is available), then stop it and confirm the port no longer answers. Dev servers often spawn child processes (npm to vite, for example), so kill the whole process group or find the listener (`ps`, `ss -ltnp`) instead of trusting the first PID. Fix failures at the cause; do not weaken lint/type config to make checks pass. Finish with a PASS / FAIL / SKIPPED table, and leave the working tree clean: `git status` must show nothing uncommitted (no logs, no stray files).
 
 ### 8. Commit and push
-Commit with conventional messages. Push only to the attached repo, to a branch (not `main`) unless the user explicitly says otherwise. If the push is refused or the repo is not attached, report it plainly and stop.
+Commit with conventional messages. Push only to this session's repo, to a branch (not `main`) unless the user explicitly says otherwise. If the push is refused, report it plainly and stop; do not try other remotes or credentials.
 
 ### 9. Hand-off checklist
 Give the user, in this order:
 1. What was built and the verification table.
-2. Their manual steps: attach both the new repo and `my-toolkit` to future cloud sessions; paste the lines from `docs/cloud-setup.md` into the cloud environment's **Setup script**; start a **new** session.
-3. The access caveat: the new project's cloud sessions can only install the toolkit if `jimmyl109/my-toolkit` is readable from that session (public, or attached with `add_repo`).
-4. How to confirm core loaded in the new project: ask "which `core:*` agents can you see, and what rules were loaded at session start?"
+2. Their manual steps: merge the pushed branch when happy; paste the lines from `docs/cloud-setup.md` into the cloud environment's **Setup script** (this project's kit lines plus its dependency install); start a **new** session on this repo.
+3. The access caveat: new sessions can only install the toolkit while `jimmyl109/my-toolkit` stays readable from the container (it is public; the environment's network policy must also allow `github.com`).
+4. How to confirm core loaded in the new session: ask "which `core:*` agents can you see, and what rules were loaded at session start?"
 5. The suggested first plan item for the product itself.

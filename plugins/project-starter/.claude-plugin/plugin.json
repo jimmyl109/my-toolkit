@@ -1,0 +1,7 @@
+{
+  "name": "project-starter",
+  "description": "Opt-in: a new-project skill that interviews you, scaffolds a project with the stack's official tooling, writes the project layer, verifies it and pushes to an empty repo you created. Install it only in the environment you use for bootstrapping.",
+  "author": { "name": "jimmyl109" },
+  "license": "MIT",
+  "keywords": ["bootstrap", "scaffold", "new-project"]
+}

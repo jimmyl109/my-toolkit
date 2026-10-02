@@ -34,12 +34,13 @@ plugins/
   typescript-react/                 kit: TypeScript / React / Next.js (no hooks)
     agents/                         typescript-reviewer, react-reviewer, react-build-resolver
     skills/                         react-patterns, react-testing, frontend-patterns, typescript-react-standards
+  project-starter/                  opt-in: new-project skill that bootstraps a repo
+    skills/new-project/             SKILL.md + templates/
 CATALOG.md                          plugins, descriptions, trigger words
 SOURCES.md                          origin of every file and what changed
 TESTING.md                          checklist for a 2-3 week trial on a real project
 tests/hooks/run.js                  automated tests for the protection hooks
 tests/skills/check.js               static checks for the new-project skill
-.claude/skills/new-project/         repo-level skill that bootstraps a new project (templates/ inside)
 THIRD_PARTY_NOTICES                 MIT notices for ECC and Ponytail
 ```
 
@@ -139,18 +140,27 @@ One-off from a shell: `MY_TOOLKIT_DISABLED_HOOKS=commit-quality claude`. Claude 
 
 ## Starting a new project
 
-Open a cloud (or local) session **on this repo** and say "start a new project". The repo-level skill `.claude/skills/new-project/` (not part of any plugin, so it costs nothing in your projects) then:
+The opt-in **`project-starter`** plugin adds a `new-project` skill. It works from a session started on the **new, empty repo itself**, so you only ever need one repo attached. This relies on `my-toolkit` being **public** (the container installs the plugins without needing access to it).
 
-1. interviews you (what it is, stack, hosting, tests; it recommends rather than listing menus),
-2. picks kits by reading `CATALOG.md`, so new kits are picked up automatically (core only if none matches),
-3. shows what needs installing and waits for approval,
-4. scaffolds with the stack's official tooling, adds lint/format/typecheck/test tooling,
-5. writes the project layer (`CLAUDE.md`, `.claude/settings.json`, `docs/cloud-setup.md`, README stub, `.gitignore`),
-6. verifies (install, build, typecheck, lint, tests, dev server in the background) and reports PASS / FAIL / SKIPPED honestly,
-7. commits and pushes to a repo **you** created and attached (it never creates repos, changes visibility, or pushes to `main` on its own),
-8. hands you a checklist: attach the repo and `my-toolkit` to future sessions, paste the setup-script lines, start a new session, confirm core loaded.
+1. Create an empty repo on GitHub and start a cloud session on it.
+2. In that cloud environment's **Setup script**, install the toolkit (add `project-starter` here; keep it out of environments you only use for normal work):
+   ```
+   claude plugin marketplace add jimmyl109/my-toolkit || echo "marketplace add FAILED"
+   claude plugin install core@my-toolkit || echo "core install FAILED"
+   claude plugin install project-starter@my-toolkit || echo "project-starter install FAILED"
+   ```
+   Start a **new** session after saving it (plugins are installed before the session starts).
+3. Say "start a new project". The skill then:
+   - interviews you (what it is, stack, hosting, tests; it recommends rather than listing menus),
+   - picks kits by reading `CATALOG.md`, so new kits are picked up automatically (core only if none matches),
+   - shows what needs installing and waits for approval,
+   - scaffolds with the stack's official tooling and adds lint/format/typecheck/test tooling,
+   - writes the project layer (`CLAUDE.md`, `.claude/settings.json`, `docs/cloud-setup.md`, README stub, `.gitignore`),
+   - verifies (install, build, typecheck, lint, tests, dev server in the background) and reports PASS / FAIL / SKIPPED honestly,
+   - commits and pushes a **branch** of that repo (it never creates repos, changes visibility, force-pushes, or pushes to `main` on its own),
+   - hands you a checklist: merge the branch, paste the project's setup-script lines, start a new session, confirm core loaded.
 
-It builds the scaffold and tooling, not the product's features; those start from a plan. Limits: the new project's cloud sessions still need `my-toolkit` to be readable (public, or attached with `add_repo`), and pushing needs the new repo attached to the session you bootstrap in. `node tests/skills/check.js` statically checks the skill (frontmatter, templates, placeholders, catalog sync).
+It builds the scaffold and tooling, not the product's features; those start from a plan. Limits: the interview and the approval pause are only exercised interactively (automated runs pre-supply the answers); pushing to a real GitHub repo is the one step not covered by an automated test; if `my-toolkit` is ever made private again, cloud sessions can no longer install it. `node tests/skills/check.js` statically checks the skill (frontmatter, templates, placeholders, catalog and marketplace sync).
 
 ## Testing the hooks
 
