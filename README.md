@@ -47,7 +47,9 @@ Components are namespaced by plugin: `core:planner`, `typescript-react:react-rev
 
 Plugins load from this repository's **default branch (`main`)**, so changes only reach projects once merged to `main` (to try an unmerged branch, see `TESTING.md`).
 
-Add to the project's `.claude/settings.json`, commit it, and Claude Code offers to install the marketplace and plugins when the folder is trusted:
+### On your own machine (interactive)
+
+Add to the project's `.claude/settings.json`, commit it, and Claude Code offers to install the marketplace and plugins when you trust the folder:
 
 ```json
 {
@@ -64,6 +66,21 @@ Add to the project's `.claude/settings.json`, commit it, and Claude Code offers 
 ```
 
 Alternatives: `claude plugin marketplace add jimmyl109/my-toolkit` then `claude plugin install core@my-toolkit --scope project` (writes the same settings), or enable `core@my-toolkit` once in `~/.claude/settings.json` to get it everywhere. Run `/reload-plugins` or restart after changes. The hooks need `node` on `PATH`.
+
+### In cloud (and other headless) sessions
+
+**The settings file alone does not load the toolkit there.** Tested in a headless session: project-level `extraKnownMarketplaces` are ignored until the folder is trusted, and even with trust the marketplace gets registered but the plugins are not installed ("Plugin ... not cached"). A cloud session starts in a fresh container, so install the plugins in the cloud environment's **setup script** (cloud environment menu, then Edit, then Setup script), which runs when each new session starts:
+
+```
+claude plugin marketplace add jimmyl109/my-toolkit
+claude plugin install core@my-toolkit
+claude plugin install typescript-react@my-toolkit    # only for TS/React projects
+npm ci                                               # project deps, so Stop typecheck/format can find tsc and prettier
+```
+
+This was verified from a clean state with an untrusted folder and no project settings: both plugins loaded, `rules/common.md` was injected at session start, and all `core:*` / `typescript-react:*` agents were available. It installs at user scope in that container, so core is on for every project opened there; leave out the kit line where it isn't needed.
+
+Requirements: the environment's network policy must allow `github.com` (and your package registry for `npm ci`), `node` must be on `PATH` (the cloud image provides it), and the session needs access to `jimmyl109/my-toolkit` if it is private (not tested). Switch hooks off for all sessions in an environment by setting the `MY_TOOLKIT_*` variables as environment variables in the cloud environment's settings (see below). Plugins have no `version`, so each fresh container installs the current `main`.
 
 ## Protection hooks (core)
 
