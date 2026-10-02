@@ -1,0 +1,21 @@
+# Cloud setup
+
+Cloud (headless) sessions do not load the toolkit from `.claude/settings.json` alone: the plugins must be installed by the cloud environment's **Setup script** (cloud environment menu, then Edit, then Setup script). Paste this, save, then start a **new** session:
+
+```bash
+#!/bin/bash
+# my-toolkit: core is always on; kits depend on this project's stack
+claude plugin marketplace add jimmyl109/my-toolkit || echo "my-toolkit marketplace add FAILED"
+claude plugin install core@my-toolkit || echo "core install FAILED"
+{{KIT_INSTALL_LINES}}
+
+# project dependencies, so the Stop typecheck/format hooks and ESLint can find the project's own tools
+{{PROJECT_INSTALL_LINES}}
+```
+
+Requirements:
+- The session must be able to read `jimmyl109/my-toolkit` (public, or attached to the session with `add_repo`). A 403 from `github.com/jimmyl109/my-toolkit` means it is not.
+- The environment's network policy must allow `github.com` and your package registry.
+- `node` must be on `PATH` (the hooks are Node scripts).
+
+Check in a new session: ask "which `core:*` agents can you see, and what rules were loaded at session start?"
